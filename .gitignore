@@ -1,0 +1,19 @@
+node_modules/
+coverage/
+*.log
+.DS_Store
+Thumbs.db
+
+# Local editor / agent settings
+.claude/
+.vscode/
+
+# Workshop source materials (deck, handout, original tool, brief) are kept out of the public repo
+reference/
+
+# Keep the built single-file deliverable, ignore anything else in dist
+dist/*
+!dist/quantum-lab.html
+
+# Word lock files
+~$*
