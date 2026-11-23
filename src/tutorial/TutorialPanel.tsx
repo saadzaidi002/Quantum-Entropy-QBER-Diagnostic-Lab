@@ -26,6 +26,9 @@ function isTypingTarget(t: EventTarget | null): boolean {
 export function TutorialPanel(p: Props) {
   const { open, step, setStep } = p;
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+  /** Phones and tablets show the panel as a bottom sheet that can be minimised to its header. */
+  const [mini, setMini] = useState(false);
+  const narrow = () => typeof window !== "undefined" && window.innerWidth < 1024;
   const headingRef = useRef<HTMLHeadingElement>(null);
   const s = STEPS[step];
 
@@ -48,14 +51,25 @@ export function TutorialPanel(p: Props) {
   const shown = revealed[s.id] ?? false;
 
   return (
-    <aside className="tutorial-panel no-print" aria-label="Tutorial" id="tutorial-panel">
+    <aside className={`tutorial-panel no-print${mini ? " mini" : ""}`} aria-label="Tutorial" id="tutorial-panel">
       <div className="tp-head">
         <h2 ref={headingRef} tabIndex={-1}>
           Lab tutorial
         </h2>
-        <button type="button" className="btn btn-small" onClick={p.onClose} aria-label="Close tutorial">
-          <Icon name="close" /> Close
-        </button>
+        <div className="btn-group">
+          <button
+            type="button"
+            className="btn btn-small btn-ghost tp-mini-btn"
+            onClick={() => setMini(!mini)}
+            aria-expanded={!mini}
+            aria-controls="tp-body"
+          >
+            {mini ? "Expand" : "Minimise"}
+          </button>
+          <button type="button" className="btn btn-small" onClick={p.onClose} aria-label="Close tutorial">
+            <Icon name="close" /> Close
+          </button>
+        </div>
       </div>
 
       <div className="tp-progress" aria-label={`Step ${step + 1} of ${STEPS.length}`}>
@@ -64,7 +78,10 @@ export function TutorialPanel(p: Props) {
             key={x.id}
             type="button"
             className={`tp-dot${i === step ? " current" : ""}${i < step ? " done" : ""}`}
-            onClick={() => setStep(i)}
+            onClick={() => {
+              setStep(i);
+              setMini(false);
+            }}
             aria-label={`Go to ${x.title}`}
             aria-current={i === step ? "step" : undefined}
           >
@@ -76,7 +93,7 @@ export function TutorialPanel(p: Props) {
         </div>
       </div>
 
-      <div className="tp-body">
+      <div className="tp-body" id="tp-body">
         <div className="tp-field">
           <label htmlFor="tp-name">Your name (for the printout)</label>
           <input id="tp-name" type="text" value={p.answers._name ?? ""} onChange={(e) => p.setAnswer("_name", e.target.value)} />
@@ -88,11 +105,25 @@ export function TutorialPanel(p: Props) {
           ))}
         </ol>
         <div className="btn-group">
-          <button type="button" className="btn btn-cyan" onClick={() => p.onDoIt(s)}>
+          <button
+            type="button"
+            className="btn btn-cyan"
+            onClick={() => {
+              p.onDoIt(s);
+              if (narrow()) setMini(true);
+            }}
+          >
             <Icon name="wand" /> Do it for me
           </button>
           {s.id === "bb84" && (
-            <button type="button" className="btn" onClick={p.onFlip3}>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                p.onFlip3();
+                if (narrow()) setMini(true);
+              }}
+            >
               Flip 3 KEEP bits for me
             </button>
           )}
@@ -151,10 +182,16 @@ export function TutorialPanel(p: Props) {
         </div>
         <div className="btn-group">
           <button type="button" className="btn btn-small" onClick={p.onPrint}>
-            <Icon name="printer" /> Print my answers
+            <Icon name="printer" /> <span className="label-long">Print my answers</span>
+            <span className="label-short" aria-hidden="true">
+              Print
+            </span>
           </button>
           <button type="button" className="btn btn-small" onClick={p.onClearAnswers}>
-            Clear answers
+            <span className="label-long">Clear answers</span>
+            <span className="label-short" aria-hidden="true">
+              Clear
+            </span>
           </button>
         </div>
         <p className="tp-hint secondary">Arrow keys ← → change step. Answers are saved in this browser if storage is allowed.</p>

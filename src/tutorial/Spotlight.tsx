@@ -35,8 +35,10 @@ export function Spotlight({ targets, token, onDone }: Props) {
   const update = useCallback(() => setRects(measure(targets)), [targets]);
 
   useLayoutEffect(() => {
-    const first = document.querySelector(`[data-tour="${targets[0]}"]`);
-    if (first && typeof first.scrollIntoView === "function") first.scrollIntoView({ block: "center", behavior: "auto" });
+    // Scroll to the highest target on the page so every highlighted item is below it.
+    const els = targets.map((id) => document.querySelector(`[data-tour="${id}"]`)).filter((e): e is Element => e !== null);
+    const first = els.sort((x, y) => x.getBoundingClientRect().top - y.getBoundingClientRect().top)[0];
+    if (first && typeof first.scrollIntoView === "function") first.scrollIntoView({ block: window.innerWidth < 1024 ? "start" : "center", behavior: "auto" });
     update();
   }, [targets, token, update]);
 

@@ -102,7 +102,7 @@ export function App() {
   };
 
   const endSpot = useCallback(() => setSpot(null), []);
-  const tabBtn = (id: Tab, label: string, icon: IconName) => (
+  const tabBtn = (id: Tab, label: string, short: string, icon: IconName) => (
     <button
       type="button"
       role="tab"
@@ -113,7 +113,10 @@ export function App() {
       onClick={() => setTab(id)}
     >
       <Icon name={icon} />
-      {label}
+      <span className="label-long">{label}</span>
+      <span className="label-short" aria-hidden="true">
+        {short}
+      </span>
     </button>
   );
 
@@ -133,8 +136,8 @@ export function App() {
               </div>
             </div>
             <nav className="tab-bar" role="tablist" aria-label="Lab sections">
-              {tabBtn("qrng", "QRNG & min-entropy", "dice")}
-              {tabBtn("bb84", "BB84 QBER & Eve", "key")}
+              {tabBtn("qrng", "QRNG & min-entropy", "QRNG", "dice")}
+              {tabBtn("bb84", "BB84 QBER & Eve", "BB84", "key")}
             </nav>
             <div className="toolbar" role="toolbar" aria-label="View and export">
               <button

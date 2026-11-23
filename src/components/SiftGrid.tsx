@@ -35,6 +35,7 @@ export function SiftGrid({ inputs, sift, flipped, onFlip, selected, onSelect }: 
         key={i}
         className={`sift-col ${st}${flippedSet.has(i) ? " flipped" : ""}${selected === i ? " selected" : ""}`}
         onMouseEnter={() => onSelect?.(i)}
+        onPointerDown={() => onSelect?.(i)}
         onFocus={() => onSelect?.(i)}
       >
         <span className="pulse-no">{i + 1}</span>
